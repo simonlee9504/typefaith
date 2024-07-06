@@ -43,3 +43,25 @@ export const subtitle = tv({
     fullWidth: true,
   },
 });
+
+export const typeface = tv({
+  base: "tracking-tight inline-flex font-semibold",
+  variants: {
+    color: {
+      faded: "text-gray-400 dark:text-gray-500",
+      correct: "text-black dark:text-white",
+      incorrect: "text-red-400 dark:text-red-500",
+    },
+    size: {
+      sm: "text-3xl",
+      md: "text-4xl",
+      lg: "text-5xl",
+    },
+    fullWidth: {
+      true: "w-full block",
+    },
+  },
+  defaultVariants: {
+    size: "sm",
+  },
+});
