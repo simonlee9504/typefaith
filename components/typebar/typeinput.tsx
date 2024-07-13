@@ -1,12 +1,14 @@
 "use client";
 
-import { FC, useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
 import { Spinner } from "@nextui-org/spinner";
 import clsx from "clsx";
 
 import { typeface } from "../primitives";
 
 import { Letter, LetterProps, LetterStatus } from "./letter";
+import { TypeContext } from "./typecontext";
+import { TypeBarStatus } from "./typebar";
 
 enum SpecialInputs {
   BACKSPACE,
@@ -33,19 +35,20 @@ const validateInput = (
 
 export interface TypeInputProps {
   className?: string;
-  text: string;
+  isLoading?: boolean;
 }
 
-export const TypeInput: FC<TypeInputProps> = ({ className, text }) => {
+export const TypeInput: FC<TypeInputProps> = ({ className, isLoading = false }) => {
+  const { text, setStatus, result, setResult } = useContext(TypeContext);
+
   const [initialLoad, setInitialLoad] = useState(false);
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputFocused, setInputFocused] = useState(false);
 
-  const wordList = text.split(" ");
   const letterRefs = useRef<Array<Array<HTMLDivElement>>>([]);
   const [letterPropsMatrix, setLetterPropsMatrix] = useState<LetterProps[][]>(
-    wordList?.map((word, wordIndex) =>
+    text.split(" ").map((word, wordIndex) =>
       Array.from(word).map((letter, letterIndex) => ({
         letter: letter,
         status: LetterStatus.FADED,
@@ -127,6 +130,13 @@ export const TypeInput: FC<TypeInputProps> = ({ className, text }) => {
     if (letter === SpecialInputs.NOOP) {
       return;
     }
+    // first letter input
+    if (!result.startTime && activeWordIndex === 0 && activeLetterIndex === 0) {
+      const tempResult = result;
+
+      tempResult.startTime = new Date();
+      setResult(tempResult);
+    }
 
     const tempLetterPropsMatrix = letterPropsMatrix;
     const activeWord = tempLetterPropsMatrix[activeWordIndex];
@@ -167,9 +177,45 @@ export const TypeInput: FC<TypeInputProps> = ({ className, text }) => {
     } else if (letter === SpecialInputs.SPACE) {
       activeLetter.active = false;
       activeLetter.endActive = false;
-      tempLetterPropsMatrix[activeWordIndex + 1][0].active = true;
-      setActiveWordIndex((prev) => prev + 1);
-      setActiveLetterIndex(0);
+      if (activeWordIndex < tempLetterPropsMatrix.length - 1) {
+        tempLetterPropsMatrix[activeWordIndex + 1][0].active = true;
+        setActiveWordIndex((prev) => prev + 1);
+        setActiveLetterIndex(0);
+      } else {
+        // typing finished (last word spaced)
+        const tempResult = result;
+
+        tempResult.correctLetters = 0;
+        tempResult.incorrectLetters = 0;
+        tempResult.extraLetters = 0;
+        for (const word of letterPropsMatrix) {
+          for (const letter of word) {
+            if (letter.status === LetterStatus.CORRECT) {
+              tempResult.correctLetters += 1;
+            } else if (letter.status === LetterStatus.INCORRECT) {
+              if (letter.letter == EXTRA_LETTER) {
+                tempResult.extraLetters += 1;
+              } else {
+                tempResult.incorrectLetters += 1;
+              }
+            }
+          }
+          // for spaces
+          word[word.length - 1].incorrectLetter != EXTRA_LETTER
+            ? (tempResult.correctLetters += 1)
+            : (tempResult.incorrectLetters += 1);
+        }
+        const matrixLength = letterPropsMatrix.length;
+
+        // undo last space
+        letterPropsMatrix[matrixLength - 1][letterPropsMatrix[matrixLength - 1].length - 1]
+          .incorrectLetter != EXTRA_LETTER
+          ? (tempResult.correctLetters -= 1)
+          : (tempResult.incorrectLetters -= 1);
+        tempResult.endTime = new Date();
+        setResult(tempResult);
+        setStatus(TypeBarStatus.RESULTS);
+      }
     } else if (activeLetter.endActive) {
       activeLetter.endActive = false;
       tempLetterPropsMatrix[activeWordIndex].push({
@@ -219,7 +265,7 @@ export const TypeInput: FC<TypeInputProps> = ({ className, text }) => {
             "absolute w-full h-full top-0 left-0 place-content-center z-10",
           )}
         >
-          {initialLoad ? (
+          {initialLoad || isLoading ? (
             <p className={clsx("text-lg", typeface())}>click to focus</p>
           ) : (
             <Spinner color="default" />
