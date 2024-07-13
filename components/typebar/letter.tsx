@@ -36,15 +36,21 @@ export const Letter: ForwardRefExoticComponent<LetterProps & React.RefAttributes
       },
       ref,
     ) => {
+      let displayLetter = "*"; // to change
+
+      if (status === LetterStatus.INCORRECT) {
+        displayLetter = incorrectLetter;
+      } else if (status === LetterStatus.CORRECT) {
+        displayLetter = letter;
+      }
+
       return (
         <div
           ref={ref}
           className={clsx(hide ? "hidden h-0 w-0 m-0 p-0" : "inline-flex h-9 align-middle")}
         >
           {active && <Caret />}
-          <div className={clsx(typeface({ color: status }), className)}>
-            {status === LetterStatus.INCORRECT ? incorrectLetter : letter}
-          </div>
+          <div className={clsx(typeface({ color: status }), className)}>{displayLetter}</div>
           {endActive && <Caret />}
         </div>
       );
