@@ -3,9 +3,9 @@ import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
 
-import { HeartFilledIcon } from "./icons";
-
 import { siteConfig } from "@/config/site";
+
+import { HeartFilledIcon } from "./icons";
 
 export interface FeedbackProps {
   className?: string;
