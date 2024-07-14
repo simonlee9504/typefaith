@@ -15,10 +15,10 @@ import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
 
-import { Feedback } from "./feedback";
-
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
+
+import { Feedback } from "./feedback";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

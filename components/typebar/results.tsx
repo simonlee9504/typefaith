@@ -27,7 +27,7 @@ export const Results: FC = () => {
     result.incorrectLetters == undefined ||
     result.extraLetters == undefined
   ) {
-    return;
+    return <></>;
   }
   const typingTime = (result.endTime.getTime() - result.startTime.getTime()) / 1000;
   const wpm = (result.correctLetters * (60 / typingTime)) / 5;
