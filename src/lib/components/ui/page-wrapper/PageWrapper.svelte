@@ -39,7 +39,9 @@
 		{/if}
 	</nav>
 
-	<main class="flex-grow">{@render children()}</main>
+	<main class="flex w-full flex-1">
+		{@render children()}
+	</main>
 
 	<footer class="mb-10 flex items-center">
 		<p class="text-sm text-muted-foreground">

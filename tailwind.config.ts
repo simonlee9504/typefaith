@@ -57,6 +57,15 @@ const config: Config = {
 			fontFamily: {
 				heading: ['Zilla Slab', ...fontFamily.sans],
 				sans: ['Inter', ...fontFamily.sans]
+			},
+			keyframes: {
+				caretBlink: {
+					'0%, 100%': { opacity: '0' },
+					'50%': { opacity: '1' }
+				}
+			},
+			animation: {
+				caretBlink: 'caretBlink 1s ease-in-out infinite'
 			}
 		}
 	}

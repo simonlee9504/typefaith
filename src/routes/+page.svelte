@@ -1,5 +1,8 @@
-<div class="flex flex-col items-center justify-center">
-	<h1 class="text-3xl">
-		Welcome to <span class="font-heading text-4xl">typefaith</span>
-	</h1>
-</div>
+<script lang="ts">
+	import TypeInput from '$lib/components/ui/type-input/TypeInput.svelte';
+	import TypeWrapper from '$lib/components/ui/type-input/TypeWrapper.svelte';
+</script>
+
+<TypeWrapper>
+	<TypeInput />
+</TypeWrapper>
